@@ -20,6 +20,11 @@ const appointmentModel = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Report",
     },
+    mode: {
+      type: String,
+      enum: ["ONLINE","OFFLINE"],
+      default: "OFFLINE",
+    },
   },
   { timestamps: true }
 );
