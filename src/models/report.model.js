@@ -8,7 +8,7 @@ const reportModel = new mongoose.Schema({
   description: {
     type: String,
   },
-  serverity: {
+  severity: {
     type: String,
     enum: ["HIGH", "MEDIUM", "LOW"],
     default: "LOW",
