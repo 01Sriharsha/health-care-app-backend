@@ -1,7 +1,7 @@
+import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
-import { ApiError } from "../util/ApiResponse";
+import { ApiError } from "../util/ApiResponse.js";
 import { asyncHandler } from "../util/asyncHandler.js";
-import { verify } from "jsonwebtoken";
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
@@ -10,7 +10,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       return ApiError(res, 403, "Token is Missing");
     }
 
-    const decodedToken = await verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decodedToken = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
     console.log("decodedToken", decodedToken);
 

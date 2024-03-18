@@ -1,4 +1,4 @@
-export const ApiError = (res, status, message) => {
+export const ApiError = (res, status, message = "Something went wrong!") => {
   return res.status(status).json({
     message,
   });
