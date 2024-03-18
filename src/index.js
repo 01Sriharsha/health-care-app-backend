@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import cookieSession from "cookie-session";
 import { connectDB } from "./lib/db.js";
 import { authRouter } from "./routes/auth.routes.js";
+import { appointmentRouter } from "./routes/appointment.routes.js"
 import "./lib/passport.js"
 
 //Configure .env variables
@@ -43,6 +44,7 @@ app.get("/", (req, res) => {
 
 //use routers
 app.use("/auth", authRouter);
+app.use("/appointment", appointmentRouter);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
