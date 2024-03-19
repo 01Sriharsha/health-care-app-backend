@@ -1,67 +1,103 @@
 import { Appointment } from "../models/appointment.model.js";
 import { User } from "../models/user.model.js";
+import { ApiError, ApiSuccess } from "../util/ApiResponse.js";
 
 // Creating new Appointment
 export const createAppointment = async (req, res) => {
   try {
-    const { datetime, status, patient, doctor, report, mode } = req.body;
+    const { datetime, patient, doctor, mode } = req.body;
 
+    // Check if all required fields are provided
+    if (!datetime || !patient || !doctor || !mode) {
+      return ApiError(res, 400, "All fields are required!");
+    }
+
+    // Check if patient exists
+    const existingPatient = await User.findById(patient);
+    if (!existingPatient) {
+      return ApiError(res, 400, "Patient not found!");
+    }
+
+    // Check if doctor exists
+    const existingDoctor = await User.findById(doctor);
+    if (!existingDoctor) {
+      return ApiError(res, 400, "Doctor not found!");
+    }
+    // Check specialist availability
+    const existingAppointment = await Appointment.findOne({ datetime, doctor });
+    if (existingAppointment) {
+        return ApiError(res, 400, "Appointment slot is already booked for this specialist.");
+    }
+
+    // If specialist is available, create new appointment
     const appointment = await Appointment.create({
       datetime,
-      status,
       patient,
       doctor,
-      report,
       mode,
     });
-    res.status(201).json({
-      success: true,
+    await appointment.save();
+    res.send({
       message: "Appointment successful",
-      data: appointment,
     });
+    return ApiSuccess(res, 201, appointment);
   } catch (error) {
-    res.status(500).json({ success: false, ERROR: error.message });
+    return ApiError(res, 500, error.message)
   }
 };
+
 
 // Deleting appointment
 export const deleteAppointment = async (req, res) => {
   try {
-    const appointment = await Appointment.findByIdAndDelete(req.params.id);
+    const appointment = await Appointment.findById(req.params.id);
+
     if (!appointment) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Appointment not found" });
+    return ApiError(res, 404, "Appointment not found");
     }
-    res
-      .status(200)
-      .json({ success: true, message: "Appointment deleted successfully" });
+
+    appointment.status = "CANCELED";
+    await appointment.save();
+
+    await Appointment.findByIdAndDelete(req.params.id);
+
+    res.send(`Appointment deleted successfully`);
+    return ApiSuccess(res, 200, appointment);
   } catch (error) {
-    res.status(500).json({ success: false, ERROR: error.message });
+    return ApiError(res, 500, error.message);
   }
 };
 
-// Updating Appointment
+
+// Updating Appointment as completed
 export const updateAppointment = async (req, res) => {
   try {
+    const {report} = req.body;
+
+    if (!report) {
+      return ApiError(res, 400, "Report is Required");
+    }
+
     const appointment = await Appointment.findByIdAndUpdate(
       req.params.id,
       req.body,
       {
+        report,
         new: true,
         runValidators: true,
       }
     );
+
     if (!appointment) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Appointment not found" });
+    return ApiError(res, 404, "Appointment not found");
     }
-    res.status(200).json({
-      success: true,
-      message: "Appointment Updated Successfully",
-      data: appointment,
-    });
+
+    appointment.status = "COMPLETED";
+    await appointment.save();
+
+    res.send("Appointment Updated Successfully");
+    return ApiSuccess(res, 200, appointment);
+
   } catch (error) {
     res.status(500).json({ success: false, ERROR: error.message });
   }
@@ -76,18 +112,16 @@ export const searchAppointmentsByPatientFullName = async (req, res) => {
     const patient = await User.findOne({ fullname });
 
     if (!patient) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Patient not found" });
+    return ApiError(res, 404, "Patient not found");
     }
 
     // Perform the search query for appointments associated with the patient's ID
     let appointments = await Appointment.find({ patient: patient._id });
     appointments = await Appointment(patient._id);
-
-    res.status(200).json({ success: true, data: appointments });
+    res.send("Search by fullName Successful")
+    return ApiSuccess(res, 200, appointments);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    return ApiError(res, 500, error.message)
   }
 };
 
@@ -95,8 +129,9 @@ export const searchAppointmentsByPatientFullName = async (req, res) => {
 export const getAllAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find();
-    res.status(200).json({ success: true, data: appointments });
+    res.send("Getting All Appointments")
+    return ApiSuccess(res, 200, appointments)
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    return ApiError(res, 500, error.message)
   }
 };
