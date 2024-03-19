@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const specalityModel = new mongoose.Schema({
+const specialityModel = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -11,7 +11,7 @@ const specalityModel = new mongoose.Schema({
     type: String,
     required: true,
   },
-  //A specality can have multiple doctors
+  //A speciality can have multiple doctors
   doctors: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -20,4 +20,4 @@ const specalityModel = new mongoose.Schema({
   ],
 });
 
-export const Specality = mongoose.model("Specality", specalityModel);
+export const Speciality = mongoose.model("Speciality", specialityModel);

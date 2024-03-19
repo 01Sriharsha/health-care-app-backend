@@ -9,7 +9,7 @@ const COOKIE_NAME = "token";
 const options = {
   httpOnly: true,
   path: "/",
-  // secure: true,
+  secure: true,
 };
 
 export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
@@ -80,7 +80,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     const token = await savedUser.generateAccessToken();
 
     return res.status(201).cookie(COOKIE_NAME, token, options).json({
-      user: savedUser,
+      data: savedUser,
     });
   } catch (error) {
     return ApiError(res, 500, error?.message);
@@ -132,7 +132,7 @@ export const loginUser = asyncHandler(async (req, res) => {
         message: `Welcome back ${
           user.role === "ADMIN" ? "ADMIN" : user.fullname?.toUpperCase()
         }!`,
-        user: loggedInUser,
+        data: loggedInUser,
       });
   } catch (error) {
     return ApiError(res, 500, error?.message);
@@ -141,10 +141,14 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 export const logoutUser = asyncHandler(async (req, res) => {
   try {
+    req.user = null;
     req.logout();
-    return res.status(200).clearCookie(COOKIE_NAME, options).json({
-      message: "Logged Out Successfully",
-    });
+    return res
+      .status(200)
+      .clearCookie(COOKIE_NAME, { ...options, maxAge: -1 })
+      .json({
+        message: "Logged Out Successfully",
+      });
   } catch (error) {
     return ApiError(res, 500, error?.message);
   }
