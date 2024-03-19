@@ -6,7 +6,11 @@ import cookieParser from "cookie-parser";
 import cookieSession from "cookie-session";
 import { connectDB } from "./lib/db.js";
 import { authRouter } from "./routes/auth.routes.js";
-import "./lib/passport.js"
+import { adminRouter } from "./routes/admin.routes.js";
+import { userRouter } from "./routes/user.routes.js";
+import { workDetailsRouter } from "./routes/workDetails.routes.js";
+import { specialitiesRouter } from "./routes/specialities.routes.js";
+import "./lib/passport.js";
 
 //Configure .env variables
 config();
@@ -26,7 +30,7 @@ app.use(
   cookieSession({
     name: "token",
     maxAge: 3600 * 1000,
-    keys : ['synapse']
+    keys: ["synapse"],
   })
 );
 
@@ -43,6 +47,10 @@ app.get("/", (req, res) => {
 
 //use routers
 app.use("/auth", authRouter);
+app.use("/admin", adminRouter);
+app.use("/users", userRouter);
+app.use("/workDetails", workDetailsRouter);
+app.use("/Specialities", specialitiesRouter);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
