@@ -7,6 +7,7 @@ import cookieSession from "cookie-session";
 import { connectDB } from "./lib/db.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { appointmentRouter } from "./routes/appointment.routes.js"
+import { reviewRouter } from "./routes/review.routes.js"
 import "./lib/passport.js"
 
 //Configure .env variables
@@ -31,7 +32,7 @@ app.use(
   })
 );
 
-//congig OAuth Login
+//config OAuth Login
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -45,6 +46,7 @@ app.get("/", (req, res) => {
 //use routers
 app.use("/auth", authRouter);
 app.use("/appointment", appointmentRouter);
+app.use("/review", reviewRouter);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
