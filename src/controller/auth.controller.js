@@ -80,7 +80,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     const token = await savedUser.generateAccessToken();
 
     return res.status(201).cookie(COOKIE_NAME, token, options).json({
-      user: savedUser,
+      data: savedUser,
     });
   } catch (error) {
     return ApiError(res, 500, error?.message);
@@ -132,7 +132,7 @@ export const loginUser = asyncHandler(async (req, res) => {
         message: `Welcome back ${
           user.role === "ADMIN" ? "ADMIN" : user.fullname?.toUpperCase()
         }!`,
-        user: loggedInUser,
+        data: loggedInUser,
       });
   } catch (error) {
     return ApiError(res, 500, error?.message);
