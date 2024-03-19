@@ -6,6 +6,10 @@ import cookieParser from "cookie-parser";
 import cookieSession from "cookie-session";
 import { connectDB } from "./lib/db.js";
 import { authRouter } from "./routes/auth.routes.js";
+import { adminRouter } from "./routes/admin.routes.js";
+import { userRouter } from "./routes/user.routes.js";
+import { workDetailsRouter } from "./routes/workDetails.routes.js";
+import { specialitiesRouter } from "./routes/specialities.routes.js";
 import { appointmentRouter } from "./routes/appointment.routes.js"
 import { reviewRouter } from "./routes/review.routes.js"
 import "./lib/passport.js"
@@ -28,7 +32,7 @@ app.use(
   cookieSession({
     name: "token",
     maxAge: 3600 * 1000,
-    keys : ['synapse']
+    keys: ["synapse"],
   })
 );
 
@@ -45,7 +49,11 @@ app.get("/", (req, res) => {
 
 //use routers
 app.use("/auth", authRouter);
+app.use("/admin", adminRouter);
+app.use("/users", userRouter);
+app.use("/workDetails", workDetailsRouter);
 app.use("/appointment", appointmentRouter);
+app.use("/Specialities", specialitiesRouter);
 app.use("/review", reviewRouter);
 
 const PORT = process.env.PORT;

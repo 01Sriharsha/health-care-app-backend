@@ -15,11 +15,23 @@ const WorkDetailsModel = new mongoose.Schema(
       type: String,
       required: true,
     },
+    currentWorkPlace: {
+      type: String,
+      required: true,
+    },
+    qualification: {
+      type: String,
+      required: true,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     //A doctor can be multi-specalist
-    specialties: [
+    specialities: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Specality",
+        ref: "Speciality",
       },
     ],
   },
