@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { verifyJWT } from "../middleware/auth.middleware.js";
 import {
   createAppointment,
   deleteAppointment,
@@ -9,7 +10,7 @@ import {
 
 const router = Router();
 
-router.route("/createAppointment").post(createAppointment);
+router.route("/createAppointment").post(verifyJWT, createAppointment);
 router.route("/deleteAppointment/:id").delete(deleteAppointment);
 router.route("/updateAppointment/:id").put(updateAppointment);
 router.route("/getAllAppointments").get(getAllAppointments);
