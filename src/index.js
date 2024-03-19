@@ -10,7 +10,8 @@ import { adminRouter } from "./routes/admin.routes.js";
 import { userRouter } from "./routes/user.routes.js";
 import { workDetailsRouter } from "./routes/workDetails.routes.js";
 import { specialitiesRouter } from "./routes/specialities.routes.js";
-import "./lib/passport.js";
+import { appointmentRouter } from "./routes/appointment.routes.js"
+import "./lib/passport.js"
 
 //Configure .env variables
 config();
@@ -50,6 +51,7 @@ app.use("/auth", authRouter);
 app.use("/admin", adminRouter);
 app.use("/users", userRouter);
 app.use("/workDetails", workDetailsRouter);
+app.use("/appointment", appointmentRouter);
 app.use("/Specialities", specialitiesRouter);
 
 const PORT = process.env.PORT;
