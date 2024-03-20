@@ -11,6 +11,7 @@ import { userRouter } from "./routes/user.routes.js";
 import { workDetailsRouter } from "./routes/workDetails.routes.js";
 import { specialitiesRouter } from "./routes/specialities.routes.js";
 import { appointmentRouter } from "./routes/appointment.routes.js"
+import { reviewRouter } from "./routes/review.routes.js"
 import "./lib/passport.js"
 
 //Configure .env variables
@@ -35,7 +36,7 @@ app.use(
   })
 );
 
-//congig OAuth Login
+//config OAuth Login
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -53,6 +54,7 @@ app.use("/users", userRouter);
 app.use("/workDetails", workDetailsRouter);
 app.use("/appointment", appointmentRouter);
 app.use("/Specialities", specialitiesRouter);
+app.use("/review", reviewRouter);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
