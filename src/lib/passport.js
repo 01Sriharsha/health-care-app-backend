@@ -31,6 +31,7 @@ export default passport.use(
           role: "PATIENT",
           emailVerfied: true,
           isOAuth: true,
+          phone : "",
           password: undefined, //password will be empty for oauth login
         });
       }

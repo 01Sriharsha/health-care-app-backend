@@ -45,6 +45,12 @@ export const addDoctorWorkDetails = asyncHandler(async (req, res) => {
       return ApiError(res, 400, "Doctor not found");
     }
 
+    const existingDetails = await WorkDetails.findOne({registrationId})
+
+    if(existingDetails){
+      return ApiError(res, 400 , "Invalid! Registration Id already exists!");
+    }
+
     const workDetails = await WorkDetails.create({
       doctor: doctor._id,
       registrationId,
@@ -52,6 +58,7 @@ export const addDoctorWorkDetails = asyncHandler(async (req, res) => {
       qualification,
       workingTime,
       specialities,
+      isVerified : false
     });
 
     const { _doc, ...unwanted } = doctor;
@@ -59,7 +66,7 @@ export const addDoctorWorkDetails = asyncHandler(async (req, res) => {
     const user = { ..._doc, workDetails };
 
     return ApiSuccess(res, 201, {
-      message: "Work Details added successfully!",
+      message: "Added work details and Submitted request successfully!",
       data: user,
     });
   } catch (error) {

@@ -1,6 +1,6 @@
 import { User } from "../models/user.model.js";
 import { Admin } from "../models/admin.model.js";
-import { ApiError } from "../util/ApiResponse.js";
+import { ApiError, ApiSuccess } from "../util/ApiResponse.js";
 import { asyncHandler } from "../util/asyncHandler.js";
 import { validateObject } from "../util/validateObject.js";
 
@@ -20,11 +20,9 @@ export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
         return ApiError(res, 401, "User not found");
       }
       const token = await user.generateAccessToken();
-      return res.cookie("token", token, { httpOnly: true, path: "/" }).json({
-        success: true,
-        message: "User logged successfully",
-        user,
-      });
+      res
+        .cookie("token", token, { httpOnly: true, path: "/" })
+        .redirect(`${process.env.CLIENT_URL}/?OAuth=true`);
     } else {
       return ApiError(res, 401, "Failed to login");
     }
@@ -54,7 +52,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     //Check if email matches with admin
     const isAdmin = await Admin.findOne({ email });
 
-    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
+    const existingUser = await User.findOne({ email });
 
     if (isAdmin || existingUser) {
       return ApiError(res, 400, "Email already exists!");
@@ -105,8 +103,8 @@ export const loginUser = asyncHandler(async (req, res) => {
       user = await Admin.findOne({ email });
     }
 
-    //Both not found throw error
-    if (!user) {
+    //Both not found or if oauth user then throw error
+    if (!user || user.isOAuth) {
       return ApiError(res, 401, "Email not found");
     }
 
@@ -149,6 +147,25 @@ export const logoutUser = asyncHandler(async (req, res) => {
       .json({
         message: "Logged Out Successfully",
       });
+  } catch (error) {
+    return ApiError(res, 500, error?.message);
+  }
+});
+
+//Fetch current logged in user
+export const fetchCurrentLoggedInUser = asyncHandler(async (req, res) => {
+  try {
+    if (!req.user) {
+      return ApiError(res, 403, "Invalid token");
+    }
+    let user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      user = await Admin.findById(req.user.id).select("-password");
+    }
+    return ApiSuccess(res, 200, {
+      data: user,
+    });
   } catch (error) {
     return ApiError(res, 500, error?.message);
   }

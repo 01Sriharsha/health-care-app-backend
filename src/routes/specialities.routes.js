@@ -9,7 +9,7 @@ import {
 
 const router = Router();
 
-router.route("/").get(verifyJWT, getAllSpecialities);
+router.route("/").get(getAllSpecialities);
 router.route("/add").post(verifyJWT, addSpeciality);
 router.route("/remove/:specialityId").post(verifyJWT, removeSpeciality);
 router.route("/update/:specialityId").post(verifyJWT, updateSpecality);

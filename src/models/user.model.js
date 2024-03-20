@@ -20,17 +20,12 @@ const userModel = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["MALE" , "FEMALE"],
+      enum: ["MALE", "FEMALE"],
     },
     city: {
       type: String,
     },
-    phone: {
-      type: String,
-      unique: true,
-      min: 10,
-      max: 10,
-    },
+    phone: String,
     role: {
       type: String,
       enum: ["PATIENT", "DOCTOR"],
