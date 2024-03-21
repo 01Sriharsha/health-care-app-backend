@@ -1,15 +1,17 @@
 import { Appointment } from "../models/appointment.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError, ApiSuccess } from "../util/ApiResponse.js";
+import { validateObject } from "../util/validateObject.js";
 
 // Creating new Appointment
 export const createAppointment = async (req, res) => {
   try {
     const { datetime, patient, doctor, mode } = req.body;
 
-    // Check if all required fields are provided
-    if (!datetime || !patient || !doctor || !mode) {
-      return ApiError(res, 400, "All fields are required!");
+    const { error } = validateObject({ datetime, patient, doctor, mode });
+
+    if (error) {
+      return ApiError(res, 400, error);
     }
 
     // Check if patient exists
@@ -26,7 +28,11 @@ export const createAppointment = async (req, res) => {
     // Check specialist availability
     const existingAppointment = await Appointment.findOne({ datetime, doctor });
     if (existingAppointment) {
-        return ApiError(res, 400, "Appointment slot is already booked for this specialist.");
+      return ApiError(
+        res,
+        400,
+        "Appointment slot is already booked for this specialist."
+      );
     }
 
     // If specialist is available, create new appointment
@@ -36,16 +42,14 @@ export const createAppointment = async (req, res) => {
       doctor,
       mode,
     });
-    await appointment.save();
-    res.send({
+    return ApiSuccess(res, 201, {
       message: "Appointment successful",
+      data: appointment,
     });
-    return ApiSuccess(res, 201, appointment);
   } catch (error) {
-    return ApiError(res, 500, error.message)
+    return ApiError(res, 500, error.message);
   }
 };
-
 
 // Deleting appointment
 export const deleteAppointment = async (req, res) => {
@@ -53,7 +57,7 @@ export const deleteAppointment = async (req, res) => {
     const appointment = await Appointment.findById(req.params.id);
 
     if (!appointment) {
-    return ApiError(res, 404, "Appointment not found");
+      return ApiError(res, 404, "Appointment not found");
     }
 
     appointment.status = "CANCELED";
@@ -68,11 +72,10 @@ export const deleteAppointment = async (req, res) => {
   }
 };
 
-
 // Updating Appointment as completed
 export const updateAppointment = async (req, res) => {
   try {
-    const {report} = req.body;
+    const { report } = req.body;
 
     if (!report) {
       return ApiError(res, 400, "Report is Required");
@@ -89,7 +92,7 @@ export const updateAppointment = async (req, res) => {
     );
 
     if (!appointment) {
-    return ApiError(res, 404, "Appointment not found");
+      return ApiError(res, 404, "Appointment not found");
     }
 
     appointment.status = "COMPLETED";
@@ -97,7 +100,6 @@ export const updateAppointment = async (req, res) => {
 
     res.send("Appointment Updated Successfully");
     return ApiSuccess(res, 200, appointment);
-
   } catch (error) {
     res.status(500).json({ success: false, ERROR: error.message });
   }
@@ -112,16 +114,16 @@ export const searchAppointmentsByPatientFullName = async (req, res) => {
     const patient = await User.findOne({ fullname });
 
     if (!patient) {
-    return ApiError(res, 404, "Patient not found");
+      return ApiError(res, 404, "Patient not found");
     }
 
     // Perform the search query for appointments associated with the patient's ID
     let appointments = await Appointment.find({ patient: patient._id });
     appointments = await Appointment(patient._id);
-    res.send("Search by fullName Successful")
+    res.send("Search by fullName Successful");
     return ApiSuccess(res, 200, appointments);
   } catch (error) {
-    return ApiError(res, 500, error.message)
+    return ApiError(res, 500, error.message);
   }
 };
 
@@ -129,9 +131,9 @@ export const searchAppointmentsByPatientFullName = async (req, res) => {
 export const getAllAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find();
-    res.send("Getting All Appointments")
-    return ApiSuccess(res, 200, appointments)
+    res.send("Getting All Appointments");
+    return ApiSuccess(res, 200, appointments);
   } catch (error) {
-    return ApiError(res, 500, error.message)
+    return ApiError(res, 500, error.message);
   }
 };
