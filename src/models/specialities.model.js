@@ -7,17 +7,13 @@ const specialityModel = new mongoose.Schema({
     unique: true,
     lowercase: true,
   },
+  term: String, //term commonly used for a practitioner specializing in particular specialty
   description: {
     type: String,
     required: true,
   },
-  //A speciality can have multiple doctors
-  doctors: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-  ],
+  possibleSymptoms: [String], // list of symptom names that can be related to this disease/specialty
+  image : String
 });
 
 export const Speciality = mongoose.model("Speciality", specialityModel);

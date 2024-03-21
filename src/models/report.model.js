@@ -14,15 +14,17 @@ const reportModel = new mongoose.Schema({
     default: "LOW",
     required: true,
   },
-  medication: {
-    type: String,
-    required: true,
+  dateReported: {
+    type: Date,
+    default: Date.now(),
   },
-  dosage: {
-    type: String,
-    required: true,
-  },
-  
+  // add precscription
+  prescription: [
+    {
+      medication: String,
+      dosage: String,
+    },
+  ],
 });
 
 export const Report = mongoose.model("Report", reportModel);

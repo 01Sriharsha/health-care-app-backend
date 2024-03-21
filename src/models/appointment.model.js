@@ -8,6 +8,7 @@ const appointmentModel = new mongoose.Schema(
       enum: ["PENDING", "CONFIRMED", "CANCELED", "COMPLETED"],
       default: "PENDING",
     },
+    symptoms: [String],
     patient: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -22,7 +23,7 @@ const appointmentModel = new mongoose.Schema(
     },
     mode: {
       type: String,
-      enum: ["ONLINE","OFFLINE"],
+      enum: ["ONLINE", "OFFLINE"],
       default: "OFFLINE",
     },
   },
