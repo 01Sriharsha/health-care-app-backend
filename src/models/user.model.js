@@ -34,14 +34,6 @@ const userModel = new mongoose.Schema(
     avatar: String,
     emailVerfied: Boolean,
     isOAuth: Boolean,
-
-    //User can have multiple symptoms
-    symptoms: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Symptoms",
-      },
-    ],
   },
   {
     timestamps: true,

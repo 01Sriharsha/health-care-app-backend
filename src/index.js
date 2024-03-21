@@ -53,7 +53,7 @@ app.use("/admin", adminRouter);
 app.use("/users", userRouter);
 app.use("/workDetails", workDetailsRouter);
 app.use("/appointment", appointmentRouter);
-app.use("/Specialities", specialitiesRouter);
+app.use("/specialities", specialitiesRouter);
 app.use("/review", reviewRouter);
 
 const PORT = process.env.PORT;
