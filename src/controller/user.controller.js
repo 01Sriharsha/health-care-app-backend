@@ -1,4 +1,6 @@
+import { Speciality } from "../models/specialities.model.js";
 import { User } from "../models/user.model.js";
+import { WorkDetails } from "../models/workdetails.model.js";
 import { ApiError, ApiSuccess } from "../util/ApiResponse.js";
 import { asyncHandler } from "../util/asyncHandler.js";
 
@@ -60,6 +62,41 @@ export const updateUser = asyncHandler(async (req, res) => {
     return ApiSuccess(res, 200, {
       message: "Updated successfully",
       data: updatedUser,
+    });
+  } catch (error) {
+    return ApiError(res, 500, error?.message);
+  }
+});
+
+export const getDoctor = asyncHandler(async (req, res) => {
+  try {
+    const doctorId = req.params.id;
+
+    const doctor = await User.findOne({
+      $and: [{ _id: doctorId }, { role: "DOCTOR" }],
+    }).select("-password");
+
+    if (!doctor) return ApiError(res, 404, "Doctor not found");
+
+    const workDetails = await WorkDetails.findOne({ doctor: doctor._id });
+
+    if (!doctor) return ApiError(res, 404, "Doctor's Work details not found");
+
+    const specialities = [];
+    for (let i = 0; i < workDetails.specialities.length; i++) {
+      const specs = workDetails.specialities;
+      const speciality = await Speciality.findById(specs[i]);
+      specialities.push(speciality);
+    }
+
+    workDetails.specialities = specialities;
+
+    const { _doc, ...unwanted } = doctor;
+
+    const user = { ..._doc, workDetails };
+
+    return ApiSuccess(res, 200, {
+      data: user,
     });
   } catch (error) {
     return ApiError(res, 500, error?.message);
