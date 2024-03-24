@@ -10,9 +10,9 @@ import { adminRouter } from "./routes/admin.routes.js";
 import { userRouter } from "./routes/user.routes.js";
 import { workDetailsRouter } from "./routes/workDetails.routes.js";
 import { specialitiesRouter } from "./routes/specialities.routes.js";
-import { appointmentRouter } from "./routes/appointment.routes.js"
-import { reviewRouter } from "./routes/review.routes.js"
-import "./lib/passport.js"
+import { appointmentRouter } from "./routes/appointment.routes.js";
+import { reviewRouter } from "./routes/review.routes.js";
+import "./lib/passport.js";
 
 //Configure .env variables
 config();
@@ -33,6 +33,10 @@ app.use(
     name: "token",
     maxAge: 3600 * 1000,
     keys: ["synapse"],
+    httpOnly: true,
+    path: "/",
+    secure: true,
+    sameSite: "strict",
   })
 );
 

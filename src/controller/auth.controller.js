@@ -10,6 +10,7 @@ const options = {
   httpOnly: true,
   path: "/",
   secure: true,
+  sameSite: "strict",
 };
 
 export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
