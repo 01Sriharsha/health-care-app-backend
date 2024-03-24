@@ -46,6 +46,11 @@ app.get("/", (req, res) => {
     status: "OK",
   });
 });
+app.get("/health", (req, res) => {
+  res.send({
+    status: "Server health is OK",
+  });
+});
 
 //use routers
 app.use("/auth", authRouter);
