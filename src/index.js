@@ -54,7 +54,7 @@ app.use("/users", userRouter);
 app.use("/workDetails", workDetailsRouter);
 app.use("/appointment", appointmentRouter);
 app.use("/specialities", specialitiesRouter);
-app.use("/review", reviewRouter);
+app.use("/reviews", reviewRouter);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

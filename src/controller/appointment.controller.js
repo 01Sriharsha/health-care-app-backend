@@ -1,14 +1,23 @@
 import { Appointment } from "../models/appointment.model.js";
 import { User } from "../models/user.model.js";
+import { WorkDetails } from "../models/workdetails.model.js";
 import { ApiError, ApiSuccess } from "../util/ApiResponse.js";
+import { asyncHandler } from "../util/asyncHandler.js";
 import { validateObject } from "../util/validateObject.js";
 
 // Creating new Appointment
 export const createAppointment = async (req, res) => {
   try {
-    const { datetime, patient, doctor, mode } = req.body;
+    const { datetime, patient, doctor, mode, type, description } = req.body;
 
-    const { error } = validateObject({ datetime, patient, doctor, mode });
+    const { error } = validateObject({
+      datetime,
+      patient,
+      doctor,
+      mode,
+      type,
+      description,
+    });
 
     if (error) {
       return ApiError(res, 400, error);
@@ -25,8 +34,10 @@ export const createAppointment = async (req, res) => {
     if (!existingDoctor) {
       return ApiError(res, 400, "Doctor not found!");
     }
+
+    const dateTime = new Date(datetime);
     // Check specialist availability
-    const existingAppointment = await Appointment.findOne({ datetime, doctor });
+    const existingAppointment = await Appointment.findOne({ dateTime, doctor });
     if (existingAppointment) {
       return ApiError(
         res,
@@ -37,13 +48,15 @@ export const createAppointment = async (req, res) => {
 
     // If specialist is available, create new appointment
     const appointment = await Appointment.create({
-      datetime,
+      type,
+      datetime: dateTime,
       patient,
       doctor,
       mode,
+      description,
     });
     return ApiSuccess(res, 201, {
-      message: "Appointment successful",
+      message: "Appointment booked successfully!",
       data: appointment,
     });
   } catch (error) {
@@ -130,10 +143,75 @@ export const searchAppointmentsByPatientFullName = async (req, res) => {
 // Retrieving all appointments
 export const getAllAppointments = async (req, res) => {
   try {
-    const appointments = await Appointment.find();
-    res.send("Getting All Appointments");
-    return ApiSuccess(res, 200, appointments);
+    const exclude = "-createdAt -updatedAt -__v -password";
+    const response = await Appointment.find().select(exclude);
+
+    const appointments = getAppointmentsArray(response);
+
+    return ApiSuccess(res, 200, {
+      data: appointments,
+    });
   } catch (error) {
     return ApiError(res, 500, error.message);
   }
+};
+
+export const getPatientAppointments = asyncHandler(async (req, res) => {
+  try {
+    const exclude = "-createdAt -updatedAt -__v -password";
+    const id = req.params.id;
+
+    if (!id) {
+      return ApiError(res, 400, "Missing params patient id");
+    }
+
+    const response = await Appointment.find({ patient: id }).select(exclude);
+
+    const appointments = await getAppointmentsArray(response);
+
+    return ApiSuccess(res, 200, {
+      data: appointments,
+    });
+  } catch (error) {
+    return ApiError(res, 500, error.message);
+  }
+});
+
+export const getDoctorAppointments = asyncHandler(async (req, res) => {
+  try {
+    const exclude = "-createdAt -updatedAt -__v -password";
+    const id = req.params.id;
+
+    if (!id) {
+      return ApiError(res, 400, "Missing params patient id");
+    }
+
+    const response = await Appointment.find({ doctor: id }).select(exclude);
+
+    const appointments = await getAppointmentsArray(response);
+
+    return ApiSuccess(res, 200, {
+      data: appointments,
+    });
+  } catch (error) {
+    return ApiError(res, 500, error.message);
+  }
+});
+
+const getAppointmentsArray = async (appointmentsArray) => {
+  const exclude = "-createdAt -updatedAt -__v -password";
+  const appointments = [];
+  for (let i = 0; i < appointmentsArray.length; i++) {
+    let app = appointmentsArray[i];
+    let patient = await User.findById(app.patient).select(exclude);
+    let doctor = await User.findById(app.doctor).select(exclude);
+    let workDetails = await WorkDetails.findOne({
+      doctor: app.doctor,
+    }).select(exclude);
+    doctor = { ...doctor._doc, workDetails };
+    app = { ...app._doc, patient: patient._doc, doctor };
+    appointments.push(app);
+  }
+
+  return appointments;
 };

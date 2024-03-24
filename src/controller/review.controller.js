@@ -1,6 +1,7 @@
 import { Review } from "../models/review.model.js";
 import { ApiError, ApiSuccess } from "../util/ApiResponse.js";
 import { User } from "../models/user.model.js";
+import { asyncHandler } from "../util/asyncHandler.js";
 
 // adding reviews
 export const createReview = async (req, res) => {
@@ -40,10 +41,11 @@ export const createReview = async (req, res) => {
       rating,
       comment,
     });
-    await review.save();
 
-    res.send("Your Feedback Submitted");
-    return ApiSuccess(res, 200, review);
+    return ApiSuccess(res, 200, {
+      message: "Thank you for your feedback!",
+      data: review,
+    });
   } catch (error) {
     console.error("Error: ", error.message);
     return ApiError(res, 500, "Feedback not Submitted");
@@ -59,9 +61,10 @@ export const deleteReview = async (req, res) => {
       return ApiError(res, 404, "Review Not Found!");
     }
 
-    await Review.findByIdAndDelete(req.params.id);
-    res.send("Review Deleted Successfully");
-    return ApiSuccess(res, 200, review);
+    await Review.findByIdAndDelete(review._id);
+    return ApiSuccess(res, 200, {
+      message: "Review removed successfully",
+    });
   } catch (error) {
     return ApiError(res, 500, error.message);
   }
@@ -119,3 +122,17 @@ export const searchReview = async (req, res) => {
     return ApiError(res, 500, error.message);
   }
 };
+
+export const getAllReviewsOfDoctor = asyncHandler(async (req, res) => {
+  const doctorId = req.params.id;
+
+  if (!doctorId) {
+    return ApiError(res, 400, "Mssing doctor id params");
+  }
+
+  const reviews = await Review.find({ doctorId: doctorId });
+
+  return ApiSuccess(res, 200, {
+    data: reviews,
+  });
+});
