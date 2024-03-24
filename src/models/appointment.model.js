@@ -8,7 +8,8 @@ const appointmentModel = new mongoose.Schema(
       enum: ["PENDING", "CONFIRMED", "CANCELED", "COMPLETED"],
       default: "PENDING",
     },
-    symptoms: [String],
+    description : String,
+    type : String,
     patient: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
