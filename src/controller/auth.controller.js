@@ -14,7 +14,7 @@ const options = {
   secure: true,
   sameSite: "strict",
   expires: expiryDate,
-  // maxAge : 3600 * 1000
+  maxAge : 3600 * 1000
 };
 
 export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
@@ -26,7 +26,7 @@ export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
       }
       const token = await user.generateAccessToken();
       res
-        .cookie("token", token, { httpOnly: true, path: "/" })
+        .cookie("token", token, options)
         .redirect(`${process.env.CLIENT_URL}/?OAuth=true`);
     } else {
       return ApiError(res, 401, "Failed to login");
