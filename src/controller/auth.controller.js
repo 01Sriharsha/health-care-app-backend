@@ -6,11 +6,15 @@ import { validateObject } from "../util/validateObject.js";
 
 const COOKIE_NAME = "token";
 
+const expiryDate = new Date(Date.now() + 3600000);
+
 const options = {
   httpOnly: true,
   path: "/",
   secure: true,
   sameSite: "strict",
+  expires: expiryDate,
+  // maxAge : 3600 * 1000
 };
 
 export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
