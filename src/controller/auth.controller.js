@@ -12,7 +12,7 @@ const options = {
   httpOnly: true,
   path: "/",
   secure: true,
-  sameSite: "strict",
+  sameSite: "none",
   expires: expiryDate,
   maxAge : 3600 * 1000
 };
